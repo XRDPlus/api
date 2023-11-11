@@ -4,42 +4,30 @@ from markupsafe import escape
 import sqlite3
 
 app = Flask(__name__)
-
 CORS(app)
-
 DATABASE = './database.db'
 
-ELETTRICA = {
-    'targa': "EL123AB",
-    'engine': "elettrica"
-}
+def is_electric(targa) :
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute('SELECT (Engine) FROM (Cars) WHERE (Plate) == ?', (targa, ))
+    rows = cursor.fetchone()
 
-BENZINA = {
-    'targa': "BE123AB",
-    'engine': "benzina"
-}
-
-AUTO = [
-    ELETTRICA,
-    BENZINA
-]
-
-@app.route("/")
-def hello_world():
-    return "<p>Hello, world!</p>"
+    if rows[0] == 'electric' :
+        return True
+    else :
+        return False
 
 @app.route('/valid/<targa>')
 def is_valid(targa):
-    valid = False
-    for auto in AUTO :
-        if auto["targa"] == targa and auto["engine"] == "elettrica":
-            valid = True
-    return jsonify(isEV=valid)
+    
+    return jsonify(isEV = is_electric(targa)), 200
 
-def insert_targa(targa):
+
+def insert_car_in_db(targa, produttore, motore):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO Customer (Targa) VALUES (?)', (targa, ))
+    cursor.execute('INSERT INTO Cars (Plate, Manifacturer, Engine) VALUES (?, ?, ?)', (targa, produttore, motore, ))
     conn.commit()
     conn.close()
 
@@ -50,14 +38,18 @@ def insert_car():
     # Check if 'targa' is present in the data
     if 'targa' not in data:
         return jsonify({'error': 'Missing "targa" parameter'}), 400
-
+    if 'produttore' not in data:
+        return jsonify({'error': 'Missing "produttore" parameter'}), 400
+    if 'motore' not in data:
+        return jsonify({'error': 'Missing "motore" parameter'}), 400
+    
        # Extract 'targa' from the JSON data
-    targa = data['targa']
+    targa, produttore, motore = data['targa'], data['produttore'], data['motore']
 
     # Insert data into the database
-    insert_targa(targa)
+    insert_car_in_db(targa, produttore, motore)
 
-    return jsonify({'message': 'Data inserted successfully'})
+    return jsonify({'message': 'Data inserted successfully'}), 200
 
 # curl -X POST -H "Content-Type: application/json" -d '{"targa": "TARGA123"}' http://127.0.0.1:5000/insert_car
 
@@ -80,8 +72,7 @@ def get_all_cars_from_db():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    # Fetch all rows from the "Customer" table
-    cursor.execute('SELECT (Targa) FROM (Customer)')
+    cursor.execute('SELECT * FROM (Cars)')
     rows = cursor.fetchall()
 
     # Close the database connection
