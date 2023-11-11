@@ -37,14 +37,13 @@ def is_angry():
 def insert_recognition_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    # age gender ethnicity emotion timestamp
+    # timestamp age gender ethnicity emotion plate
     cursor.execute(
-        'INSERT INTO Recognition (Timestamp, Age, Ethnicity, Gender, Emotion) VALUES (?, ?, ?, ?, ?)',
-        (data['time_stamp'], data['age'], data['ethnicity'], data['gender'], data['emotion'], )
+        'INSERT INTO Recognition (Timestamp, Age, Ethnicity, Gender, Emotion) VALUES (?, ?, ?, ?, ?, ?)',
+        (data['time_stamp'], data['age'], data['ethnicity'], data['gender'], data['emotion'], data['plate'])
     )
     conn.commit()
     conn.close()
-
 
 @app.route('/insert_recognition', methods=['POST'])
 def insert_recognition():
@@ -55,6 +54,43 @@ def insert_recognition():
 
     return jsonify({'message': 'Data inserted successfully'}), 200
 
+def insert_parking_arrival_in_db(data):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute(
+        'INSERT INTO Arrival (Timestamp, Plate) VALUES (?, ?)',
+        (data['time_stamp'], data['plate'], )
+    )
+    conn.commit()
+    conn.close()
+
+@app.route('/parking_arrival', methods=['POST'])
+def parking_arrival():
+    data = request.get_json()
+
+    # Insert data into the database
+    insert_parking_arrival_in_db(data)
+
+    return jsonify({'message': 'Data inserted successfully'}), 200
+
+def insert_abusive_parking_in_db(data):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute(
+        'INSERT INTO AbusiveParking (Timestamp, Plate) VALUES (?, ?)',
+        (data['time_stamp'], data['plate'], )
+    )
+    conn.commit()
+    conn.close()
+
+@app.route('/abusive_parking', methods=['POST'])
+def abusive_parking():
+    data = request.get_json()
+
+    # Insert data into the database
+    insert_abusive_parking_in_db(data)
+
+    return jsonify({'message': 'Data inserted successfully'}), 200
 
 def insert_car_in_db(targa, produttore, motore):
     conn = sqlite3.connect(DATABASE)
