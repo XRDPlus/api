@@ -23,6 +23,38 @@ def is_valid(targa):
     
     return jsonify(isEV = is_electric(targa)), 200
 
+@app.route('/angry', methods=['POST'])
+def is_angry():
+    data = request.get_json()
+
+    if 'sentiment' not in data:
+        return jsonify({'angry': 'Missing "sentiment" parameter'}), 400
+    elif data['sentiment'] == "angry" :
+        return jsonify(help_needed=True), 200
+    else :
+        return jsonify(help_needed=False), 200
+
+def insert_recognition_in_db(data):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    # age gender ethnicity emotion timestamp
+    cursor.execute(
+        'INSERT INTO Recognition (Timestamp, Age, Ethnicity, Gender, Emotion) VALUES (?, ?, ?, ?, ?)',
+        (data['time_stamp'], data['age'], data['ethnicity'], data['gender'], data['emotion'], )
+    )
+    conn.commit()
+    conn.close()
+
+
+@app.route('/insert_recognition', methods=['POST'])
+def insert_recognition():
+    data = request.get_json()
+
+    # Insert data into the database
+    insert_recognition_in_db(data)
+
+    return jsonify({'message': 'Data inserted successfully'}), 200
+
 
 def insert_car_in_db(targa, produttore, motore):
     conn = sqlite3.connect(DATABASE)
@@ -51,7 +83,7 @@ def insert_car():
 
     return jsonify({'message': 'Data inserted successfully'}), 200
 
-# curl -X POST -H "Content-Type: application/json" -d '{"targa": "TARGA123"}' http://127.0.0.1:5000/insert_car
+# curl -X POST -H "Content-Type: application/json" -d '{"targa": "TARGA123", "produttore": "MacchineVeloci", "motore": "electric"}' http://127.0.0.1:5000/insert_car
 
 def targa_in_db(targa) :
     conn = sqlite3.connect(DATABASE)
