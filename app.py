@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from markupsafe import escape
 import sqlite3
 
 app = Flask(__name__)
+
+CORS(app)
 
 DATABASE = './database.db'
 
@@ -31,7 +34,7 @@ def is_valid(targa):
     for auto in AUTO :
         if auto["targa"] == targa and auto["engine"] == "elettrica":
             valid = True
-    return jsonify(is_electric=valid)
+    return jsonify(isEV=valid)
 
 def insert_targa(targa):
     conn = sqlite3.connect(DATABASE)
