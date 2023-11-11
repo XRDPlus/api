@@ -36,8 +36,8 @@ def insert_profiling_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO Profiling (Age, Ethnicity, Gender, Emotion, Plate, StationID) VALUES (?, ?, ?, ?, ?, ?)',
-        (data['age'], data['ethnicity'], data['gender'], data['emotion'], data['plate'], data['stationID'], )
+        'INSERT INTO Profiling (Timestamp,Age, Ethnicity, Gender, Emotion, Plate, People, StationID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        (data['time_stamp'], data['age'], data['ethnicity'], data['gender'], data['emotion'], data['plate'], data['people'], data['stationID'], )
     )
     conn.commit()
     conn.close()
@@ -48,6 +48,8 @@ def insert_profiling_in_db(data):
 def user_profiling():
     data = request.get_json()
 
+    if 'time_stamp' not in data:
+        return jsonify({'error': 'Missing "time_stamp" parameter'}), 400
     if 'age' not in data:
         return jsonify({'error': 'Missing "age" parameter'}), 400
     if 'ethnicity' not in data:
@@ -58,6 +60,8 @@ def user_profiling():
         return jsonify({'error': 'Missing "emotion" parameter'}), 400
     if 'plate' not in data:
         return jsonify({'error': 'Missing "plate" parameter'}), 400
+    if 'people' not in data:
+        return jsonify({'error': 'Missing "people" parameter'}), 400
     if 'stationID' not in data:
         return jsonify({'error': 'Missing "stationID" parameter'}), 400
 

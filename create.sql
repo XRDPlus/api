@@ -27,6 +27,7 @@ CREATE TABLE "Profiling" (
 	"Gender"	TEXT NOT NULL,
 	"Emotion"	TEXT NOT NULL,
 	"People"	INTEGER NOT NULL,
+	"StationID" INTEGER NOT NULL,
 	PRIMARY KEY("Plate")
 );
 
