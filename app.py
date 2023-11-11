@@ -7,6 +7,10 @@ app = Flask(__name__)
 CORS(app)
 DATABASE = './database.db'
 
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+
 # Get is the vehicle is electric
 
 def is_electric(targa) :
