@@ -36,8 +36,8 @@ def insert_profiling_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO Profiling (Age, Ethnicity, Gender, Emotion, Plate) VALUES (?, ?, ?, ?, ?)',
-        (data['age'], data['ethnicity'], data['gender'], data['emotion'], data['plate'], )
+        'INSERT INTO Profiling (Age, Ethnicity, Gender, Emotion, Plate, StationID) VALUES (?, ?, ?, ?, ?, ?)',
+        (data['age'], data['ethnicity'], data['gender'], data['emotion'], data['plate'], data['stationID'], )
     )
     conn.commit()
     conn.close()
@@ -45,6 +45,19 @@ def insert_profiling_in_db(data):
 @app.route('/user_profiling', methods=['POST'])
 def user_profiling():
     data = request.get_json()
+
+    if 'age' not in data:
+        return jsonify({'error': 'Missing "age" parameter'}), 400
+    if 'ethnicity' not in data:
+        return jsonify({'error': 'Missing "ethnicity" parameter'}), 400
+    if 'gender' not in data:
+        return jsonify({'error': 'Missing "gender" parameter'}), 400
+    if 'emotion' not in data:
+        return jsonify({'error': 'Missing "emotion" parameter'}), 400
+    if 'plate' not in data:
+        return jsonify({'error': 'Missing "plate" parameter'}), 400
+    if 'stationID' not in data:
+        return jsonify({'error': 'Missing "stationID" parameter'}), 400
 
     # Insert data into the database
     insert_profiling_in_db(data)
@@ -71,8 +84,8 @@ def insert_parking_arrival_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO ParkingArrival (Timestamp, Plate) VALUES (?, ?)',
-        (data['time_stamp'], data['plate'], )
+        'INSERT INTO ParkingArrival (Timestamp, Plate, StationID) VALUES (?, ?, ?)',
+        (data['time_stamp'], data['plate'], data['stationID'], )
     )
     conn.commit()
     conn.close()
@@ -80,6 +93,13 @@ def insert_parking_arrival_in_db(data):
 @app.route('/parking_arrival', methods=['POST'])
 def parking_arrival():
     data = request.get_json()
+
+    if 'time_stamp' not in data:
+        return jsonify({'error': 'Missing "time_stamp" parameter'}), 400
+    if 'plate' not in data:
+        return jsonify({'error': 'Missing "plate" parameter'}), 400
+    if 'stationID' not in data:
+        return jsonify({'error': 'Missing "stationID" parameter'}), 400
 
     # Insert data into the database
     insert_parking_arrival_in_db(data)
@@ -91,8 +111,8 @@ def insert_abusive_parking_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO AbusiveParking (Timestamp, Plate) VALUES (?, ?)',
-        (data['time_stamp'], data['plate'], )
+        'INSERT INTO AbusiveParking (Timestamp, Plate, StationID) VALUES (?, ?, ?)',
+        (data['time_stamp'], data['plate'], data['stationID'], )
     )
     conn.commit()
     conn.close()
@@ -100,6 +120,13 @@ def insert_abusive_parking_in_db(data):
 @app.route('/abusive_parking', methods=['POST'])
 def abusive_parking():
     data = request.get_json()
+
+    if 'time_stamp' not in data:
+        return jsonify({'error': 'Missing "time_stamp" parameter'}), 400
+    if 'plate' not in data:
+        return jsonify({'error': 'Missing "plate" parameter'}), 400
+    if 'stationID' not in data:
+        return jsonify({'error': 'Missing "stationID" parameter'}), 400
 
     # Insert data into the database
     insert_abusive_parking_in_db(data)
@@ -111,8 +138,8 @@ def insert_driver_out_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO DriverOut (Timestamp, Plate) VALUES (?, ?)',
-        (data['time_stamp'], data['plate'], )
+        'INSERT INTO DriverOut (Timestamp, Plate, StationID) VALUES (?, ?, ?)',
+        (data['time_stamp'], data['plate'], data['stationID'], )
     )
     conn.commit()
     conn.close()
@@ -121,6 +148,13 @@ def insert_driver_out_in_db(data):
 def driver_out():
     data = request.get_json()
 
+    if 'time_stamp' not in data:
+        return jsonify({'error': 'Missing "time_stamp" parameter'}), 400
+    if 'plate' not in data:
+        return jsonify({'error': 'Missing "plate" parameter'}), 400
+    if 'stationID' not in data:
+        return jsonify({'error': 'Missing "stationID" parameter'}), 400
+
     # Insert data into the database
     insert_driver_out_in_db(data)
 
@@ -128,10 +162,13 @@ def driver_out():
 
 ### Cars management
 
-def insert_car_in_db(targa, produttore, motore):
+def insert_car_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO Cars (Plate, Manifacturer, Engine) VALUES (?, ?, ?)', (targa, produttore, motore, ))
+    cursor.execute(
+        'INSERT INTO Cars (Plate, Manifacturer, Engine) VALUES (?, ?, ?)',
+        (data['plate'], data['manifacturer'], data['engine'], )
+    )
     conn.commit()
     conn.close()
 
@@ -139,23 +176,17 @@ def insert_car_in_db(targa, produttore, motore):
 def insert_car():
     data = request.get_json()
 
-    # Check if 'targa' is present in the data
-    if 'targa' not in data:
-        return jsonify({'error': 'Missing "targa" parameter'}), 400
-    if 'produttore' not in data:
-        return jsonify({'error': 'Missing "produttore" parameter'}), 400
-    if 'motore' not in data:
-        return jsonify({'error': 'Missing "motore" parameter'}), 400
+    if 'plate' not in data:
+        return jsonify({'error': 'Missing "plate" parameter'}), 400
+    if 'manifacturer' not in data:
+        return jsonify({'error': 'Missing "manifacturer" parameter'}), 400
+    if 'engine' not in data:
+        return jsonify({'error': 'Missing "engine" parameter'}), 400
     
-    # Extract 'targa' from the JSON data
-    targa, produttore, motore = data['targa'], data['produttore'], data['motore']
-
     # Insert data into the database
-    insert_car_in_db(targa, produttore, motore)
+    insert_car_in_db(data)
 
     return jsonify({'message': 'Data inserted successfully'}), 200
-
-# curl -X POST -H "Content-Type: application/json" -d '{"targa": "TARGA123", "produttore": "MacchineVeloci", "motore": "electric"}' http://127.0.0.1:5000/insert_car
 
 # Check if the car is in the database
 
@@ -163,7 +194,10 @@ def plate_in_db(plate) :
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    cursor.execute('SELECT COUNT(*) FROM (Customer) WHERE (Targa) = ?', (plate,))
+    cursor.execute(
+        'SELECT COUNT(*) FROM (Customer) WHERE (Targa) = ?',
+        (plate,)
+    )
     count = cursor.fetchone()[0]
 
     conn.close()
@@ -191,6 +225,38 @@ def get_all_cars_from_db():
 @app.route('/all_cars')
 def all_cars():
     return jsonify(get_all_cars_from_db())
+
+### Station management
+
+def insert_station_in_db(data):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute(
+        'INSERT INTO Stations (StationID, Name, Address, Lat, Lon) VALUES (?, ?, ?, ?, ?)',
+        (data['stationID'], data['name'], data['address'], data['lat'], data['lon'] )
+    )
+    conn.commit()
+    conn.close()
+
+@app.route('/insert_station', methods=['POST'])
+def insert_station():
+    data = request.get_json()
+
+    if 'stationID' not in data:
+        return jsonify({'error': 'Missing "stationID" parameter'}), 400
+    if 'name' not in data:
+        return jsonify({'error': 'Missing "name" parameter'}), 400
+    if 'address' not in data:
+        return jsonify({'error': 'Missing "address" parameter'}), 400
+    if 'lat' not in data:
+        return jsonify({'error': 'Missing "lat" parameter'}), 400
+    if 'lon' not in data:
+        return jsonify({'error': 'Missing "lon" parameter'}), 400
+    
+    # Insert data into the database
+    insert_station_in_db(data)
+
+    return jsonify({'message': 'Data inserted successfully'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

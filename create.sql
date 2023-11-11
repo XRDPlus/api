@@ -38,6 +38,8 @@ CREATE TABLE "Cars" (
 
 CREATE TABLE "Stations" (
 	"StationID"	INTEGER NOT NULL,
+	"Name"	TEXT NOT NULL,
+	"Address"	TEXT NOT NULL,
 	"Latitude"	REAL NOT NULL,
 	"Longitude"	REAL NOT NULL,
 	PRIMARY KEY("StationID")
