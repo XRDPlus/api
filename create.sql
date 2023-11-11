@@ -20,12 +20,13 @@ CREATE TABLE "DriverOut" (
 );
 
 CREATE TABLE "Profiling" (
+	"Timestamp"	REAL NOT NULL,
+	"Plate"	TEXT NOT NULL,
 	"Age"	INTEGER NOT NULL,
 	"Ethnicity"	TEXT NOT NULL,
 	"Gender"	TEXT NOT NULL,
 	"Emotion"	TEXT NOT NULL,
-	"Plate"	TEXT NOT NULL,
-	"StationID" INTEGER NOT NULL,
+	"People"	INTEGER NOT NULL,
 	PRIMARY KEY("Plate")
 );
 
