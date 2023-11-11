@@ -42,6 +42,8 @@ def insert_profiling_in_db(data):
     conn.commit()
     conn.close()
 
+# Insert user profiling
+
 @app.route('/user_profiling', methods=['POST'])
 def user_profiling():
     data = request.get_json()
@@ -64,6 +66,26 @@ def user_profiling():
 
     return jsonify({'message': 'Data inserted successfully'}), 200
 
+# Get the profiling of the user
+
+def get_profiling_from_db(plate):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        'SELECT * FROM (Profiling) WHERE (Plate) = ?',
+        (plate,)
+    )
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows
+
+@app.route('/profiling/<plate>')
+def profiling_by_plate(plate):
+    return jsonify(get_profiling_from_db(plate))
+
 # Get if the customer is angry or not
 
 @app.route('/angry', methods=['POST'])
@@ -79,7 +101,7 @@ def is_angry():
 
 ### Timing of parking
 
-# Get the time of the parking
+# Insert the time of the parking
 def insert_parking_arrival_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -106,7 +128,25 @@ def parking_arrival():
 
     return jsonify({'message': 'Data inserted successfully'}), 200
 
-# Get the time of the abusive parking
+def get_parking_arrival_from_db(plate):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        'SELECT * FROM (ParkingArrival) WHERE (Plate) = ?',
+        (plate,)
+    )
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows
+
+@app.route('/parking_arrival/<plate>')
+def parking_arrival_by_plate(plate):
+    return jsonify(get_parking_arrival_from_db(plate))
+
+# Insert the time of the abusive parking
 def insert_abusive_parking_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -132,6 +172,25 @@ def abusive_parking():
     insert_abusive_parking_in_db(data)
 
     return jsonify({'message': 'Data inserted successfully'}), 200
+
+def get_abusive_parking_from_db(plate):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        'SELECT * FROM (AbusiveParking) WHERE (Plate) = ?',
+        (plate,)
+    )
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows
+
+@app.route('/abusive_parking/<plate>')
+def abusive_parking_by_plate(plate):
+    return jsonify(get_abusive_parking_from_db(plate))
+
 
 # Time when the driver gets out of the car
 def insert_driver_out_in_db(data):
@@ -159,6 +218,24 @@ def driver_out():
     insert_driver_out_in_db(data)
 
     return jsonify({'message': 'Data inserted successfully'}), 200
+
+def get_driver_out_from_db(plate):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        'SELECT * FROM (DriverOut) WHERE (Plate) = ?',
+        (plate,)
+    )
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows
+
+@app.route('/driver_out/<plate>')
+def driver_out_by_plate(plate):
+    return jsonify(get_driver_out_from_db(plate))
 
 ### Cars management
 
@@ -257,6 +334,40 @@ def insert_station():
     insert_station_in_db(data)
 
     return jsonify({'message': 'Data inserted successfully'}), 200
+
+def get_all_stations_from_db():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM (Stations)')
+    rows = cursor.fetchall()
+
+    # Close the database connection
+    conn.close()
+
+    return rows
+
+@app.route('/all_stations')
+def all_stations():
+    return jsonify(get_all_stations_from_db())
+
+def get_station_from_db(stationID):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute(
+        'SELECT * FROM (Stations) WHERE (StationID) = ?',
+        (stationID,)
+    )
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows
+
+@app.route('/station/<stationID>')
+def station_by_id(stationID):
+    return jsonify(get_station_from_db(stationID))
 
 if __name__ == '__main__':
     app.run(debug=True)
