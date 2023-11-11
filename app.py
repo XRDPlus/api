@@ -313,7 +313,7 @@ def insert_station_in_db(data):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute(
-        'INSERT INTO Stations (StationID, Name, Address, Lat, Lon) VALUES (?, ?, ?, ?, ?)',
+        'INSERT INTO Stations (StationID, Name, Address, Latitude, Longitude) VALUES (?, ?, ?, ?, ?)',
         (data['stationID'], data['name'], data['address'], data['lat'], data['lon'] )
     )
     conn.commit()
